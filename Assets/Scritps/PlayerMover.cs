@@ -9,16 +9,21 @@ public class PlayerMover : MonoBehaviour
     [SerializeField]
     private float moveSpeed;
     [SerializeField]
+    private float walkSpeed;
+    [SerializeField]
     private float jumpSpeed;
 
     private CharacterController controller;
+    private Animator animator;
 
     private Vector3 moveDir;
     private float ySpeed = 0;
+    private bool walk = false;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
     }
 
     private void OnEnable()
@@ -38,8 +43,20 @@ public class PlayerMover : MonoBehaviour
     {
         while (true)
         {
-            controller.Move(transform.forward * moveDir.z * moveSpeed * Time.deltaTime);
-            controller.Move(transform.right * moveDir.x * moveSpeed * Time.deltaTime);
+            if (walk)
+            {
+                controller.Move(transform.forward * moveDir.z * walkSpeed * Time.deltaTime);
+                controller.Move(transform.right * moveDir.x * walkSpeed * Time.deltaTime);
+            }
+            else
+            {
+                controller.Move(transform.forward * moveDir.z * moveSpeed * Time.deltaTime);
+                controller.Move(transform.right * moveDir.x * moveSpeed * Time.deltaTime);
+            }
+
+            animator.SetFloat("XInput", moveDir.x, 0.1f, Time.deltaTime);
+            animator.SetFloat("YInput", moveDir.z, 0.1f, Time.deltaTime);
+
             yield return null;
         }
     }
@@ -63,12 +80,21 @@ public class PlayerMover : MonoBehaviour
     {
         Vector2 input = value.Get<Vector2>();
         moveDir = new Vector3(input.x, 0, input.y);
+
+        animator.SetBool("Move", input.sqrMagnitude > 0);
     }
 
     private void OnJump(InputValue value)
     {
         if (GroundCheck())
             ySpeed = jumpSpeed;
+    }
+
+    private void OnWalk(InputValue value)
+    {
+        walk = value.isPressed;
+
+        animator.SetBool("Walk", walk);
     }
 
     private bool GroundCheck()
