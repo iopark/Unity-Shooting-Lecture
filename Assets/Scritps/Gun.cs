@@ -8,6 +8,7 @@ public class Gun : MonoBehaviour
     [SerializeField] private int damage;
     [SerializeField] private ParticleSystem bulletEffect;
     [SerializeField] private ParticleSystem muzzleEffect;
+    [SerializeField] private TrailRenderer bulletTrail;
 
     public void Fire()
     {
@@ -22,6 +23,30 @@ public class Gun : MonoBehaviour
             ParticleSystem effect = Instantiate(bulletEffect, hit.point, Quaternion.LookRotation(hit.normal));
             effect.transform.parent = hit.transform.transform;
             Destroy(effect.gameObject, 3f);
+
+            TrailRenderer trail = Instantiate(bulletTrail, muzzleEffect.transform.position, Quaternion.identity);
+            StartCoroutine(TrailRoutine(trail, trail.transform.position, hit.point));
+            Destroy(trail.gameObject, 3f);
+        }
+        else
+        {
+            TrailRenderer trail = Instantiate(bulletTrail, muzzleEffect.transform.position, Quaternion.identity);
+            StartCoroutine(TrailRoutine(trail, trail.transform.position, Camera.main.transform.forward * maxDistance));
+            Destroy(trail.gameObject, 3f);
+        }
+    }
+
+    IEnumerator TrailRoutine(TrailRenderer trail, Vector3 startPoint, Vector3 endPoint)
+    {
+        float totalTime = Vector2.Distance(startPoint, endPoint) / maxDistance;
+
+        float time = 0;
+        while (time < 1)
+        {
+            trail.transform.position = Vector3.Lerp(startPoint, endPoint, time);
+            time += Time.deltaTime / totalTime;
+
+            yield return null;
         }
     }
 }
