@@ -8,6 +8,7 @@ public class PlayerShooter : MonoBehaviour
 {
     [SerializeField] private Rig aimRig;
     [SerializeField] private float reloadTime;
+    [SerializeField] private WeaponHolder weaponHolder;
 
     private Animator animator;
     private bool reloading;
@@ -17,12 +18,18 @@ public class PlayerShooter : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
+    public void Fire()
+    {
+        weaponHolder.Fire();
+        animator.SetTrigger("Fire");
+    }
+
     private void OnFire(InputValue value)
     {
         if (reloading)
             return;
 
-        animator.SetTrigger("Fire");
+        Fire();
     }
 
     private void OnReload(InputValue value)
