@@ -6,6 +6,6 @@ public class Target : MonoBehaviour, IHittable
 {
     public void Hit(RaycastHit hit, int damage)
     {
-        Destroy(gameObject);
+        
     }
 }
