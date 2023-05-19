@@ -25,34 +25,39 @@ using System.Collections.Generic;
        힙영역의 여유공간이 줄어들어 오히려 프로그램에 부담이 되는 경우가 있음
 */
 
-public class ObjectPooler
+namespace DesingPattern
 {
-    private Stack<PooledObject> objectPool = new Stack<PooledObject>();
-    private int poolSize = 100;
 
-    public void CreatePool()
+    public class ObjectPooler
     {
-        for (int i = 0; i < poolSize; i++)
+        private Stack<PooledObject> objectPool = new Stack<PooledObject>();
+        private int poolSize = 100;
+
+        public void CreatePool()
         {
-            objectPool.Push(new PooledObject());
+            for (int i = 0; i < poolSize; i++)
+            {
+                objectPool.Push(new PooledObject());
+            }
+        }
+
+        public PooledObject GetPool()
+        {
+            if (objectPool.Count > 0)
+                return objectPool.Pop();
+            else
+                return new PooledObject();
+        }
+
+        public void ReturnPool(PooledObject pooled)
+        {
+            objectPool.Push(pooled);
         }
     }
 
-    public PooledObject GetPool()
+    public class PooledObject
     {
-        if (objectPool.Count > 0)
-            return objectPool.Pop();
-        else
-            return new PooledObject();
+        // 생성&삭제가 빈번한 클래스
     }
 
-    public void ReturnPool(PooledObject pooled)
-    {
-        objectPool.Push(pooled);
-    }
-}
-
-public class PooledObject
-{
-    // 생성&삭제가 빈번한 클래스
 }
