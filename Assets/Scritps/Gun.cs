@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Build.Content;
 using UnityEngine;
 
 public class Gun : MonoBehaviour
@@ -20,20 +21,32 @@ public class Gun : MonoBehaviour
             IHittable target = hit.transform.GetComponent<IHittable>();
             target?.Hit(hit, damage);
 
-            ParticleSystem effect = Instantiate(bulletEffect, hit.point, Quaternion.LookRotation(hit.normal));
+            //ParticleSystem effect = Instantiate(bulletEffect, hit.point, Quaternion.LookRotation(hit.normal));
+            ParticleSystem effect = GameManager.Pool.Get(bulletEffect, hit.point, Quaternion.LookRotation(hit.normal));
             effect.transform.parent = hit.transform.transform;
-            Destroy(effect.gameObject, 3f);
+            StartCoroutine(DelayReleaseRoutine(effect.gameObject, 3f));
+            //Destroy(effect.gameObject, 3f);
 
-            TrailRenderer trail = Instantiate(bulletTrail, muzzleEffect.transform.position, Quaternion.identity);
+            //TrailRenderer trail = Instantiate(bulletTrail, muzzleEffect.transform.position, Quaternion.identity);
+            TrailRenderer trail = GameManager.Pool.Get(bulletTrail, muzzleEffect.transform.position, Quaternion.identity);
             StartCoroutine(TrailRoutine(trail, trail.transform.position, hit.point));
-            Destroy(trail.gameObject, 3f);
+            StartCoroutine(DelayReleaseRoutine(trail.gameObject, 3f));
+            //Destroy(trail.gameObject, 3f);
         }
         else
         {
-            TrailRenderer trail = Instantiate(bulletTrail, muzzleEffect.transform.position, Quaternion.identity);
+            //TrailRenderer trail = Instantiate(bulletTrail, muzzleEffect.transform.position, Quaternion.identity);
+            TrailRenderer trail = GameManager.Pool.Get(bulletTrail, muzzleEffect.transform.position, Quaternion.identity);
             StartCoroutine(TrailRoutine(trail, trail.transform.position, Camera.main.transform.forward * maxDistance));
-            Destroy(trail.gameObject, 3f);
+            StartCoroutine(DelayReleaseRoutine(trail.gameObject, 3f));
+            //Destroy(trail.gameObject, 3f);
         }
+    }
+
+    IEnumerator DelayReleaseRoutine(GameObject obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        GameManager.Pool.Release(obj);
     }
 
     IEnumerator TrailRoutine(TrailRenderer trail, Vector3 startPoint, Vector3 endPoint)
