@@ -7,9 +7,14 @@ public class Gun : MonoBehaviour
 {
     [SerializeField] private float maxDistance;
     [SerializeField] private int damage;
-    [SerializeField] private ParticleSystem bulletEffect;
     [SerializeField] private ParticleSystem muzzleEffect;
-    [SerializeField] private TrailRenderer bulletTrail;
+
+    private ParticleSystem bulletEffect;
+
+    public void Awake()
+    {
+        bulletEffect = GameManager.Resource.Load<ParticleSystem>("Prefabs/BulletHitEffect");
+    }
 
     public void Fire()
     {
@@ -25,13 +30,13 @@ public class Gun : MonoBehaviour
             effect.transform.parent = hit.transform.transform;
             GameManager.Resource.Destroy(effect.gameObject, 3f);
 
-            TrailRenderer trail = GameManager.Resource.Instantiate(bulletTrail, muzzleEffect.transform.position, Quaternion.identity, true);
+            TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("Prefabs/BulletTrail", muzzleEffect.transform.position, Quaternion.identity, true);
             StartCoroutine(TrailRoutine(trail, trail.transform.position, hit.point));
             GameManager.Resource.Destroy(trail.gameObject, 3f);
         }
         else
         {
-            TrailRenderer trail = GameManager.Resource.Instantiate(bulletTrail, muzzleEffect.transform.position, Quaternion.identity, true);
+            TrailRenderer trail = GameManager.Resource.Instantiate<TrailRenderer>("Prefabs/BulletTrail", muzzleEffect.transform.position, Quaternion.identity, true);
             StartCoroutine(TrailRoutine(trail, trail.transform.position, Camera.main.transform.forward * maxDistance));
             GameManager.Resource.Destroy(trail.gameObject, 3f);
         }
