@@ -101,6 +101,35 @@ public class PoolManager : MonoBehaviour
         }
     }
 
+    public bool IsContain<T>(T original) where T : Object
+    {
+        if (original is GameObject)
+        {
+            GameObject prefab = original as GameObject;
+            string key = prefab.name;
+
+            if (poolDic.ContainsKey(key))
+                return true;
+            else
+                return false;
+
+        }
+        else if (original is Component)
+        {
+            Component component = original as Component;
+            string key = component.gameObject.name;
+
+            if (poolDic.ContainsKey(key))
+                return true;
+            else
+                return false;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     private void CreatePool(string key, GameObject prefab)
     {
         GameObject root = new GameObject();
